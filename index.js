@@ -110,6 +110,10 @@ class Connection {
 		});
 	}
 
+	send(data) {
+		this.socket.send(e(data));
+	}
+
 	identify() {
 		return new Promise((resolve, reject) => {
 			this.main.emit('DEBUG', this.shard, 'sent identify packet');
