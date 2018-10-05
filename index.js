@@ -105,7 +105,7 @@ class Connection {
 			});
 			this.socket.once('error', () => {
 				this.main.emit('DEBUG', this.shard, 'recieved error ' + e.message + ', reconnecting in 5');
-				setTimeout(() => this.close.then(() => this.connect()), 5000);
+				setTimeout(() => this.close().then(() => this.connect()), 5000);
 			});
 		});
 	}
