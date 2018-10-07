@@ -67,10 +67,10 @@ class Connection {
 			clearInterval(this.hbtimer);
 		}
 		return new Promise((resolve, reject) => {
-			if (this.socket.readyState === 1) {
+			if (this.socket.readyState !== 3) {
 				this.socket.close(1001, 'cya later alligator');
 				this.socket.removeAllListeners('close');
-				this.socket.on('close', () => {
+				this.socket.once('close', () => {
 					this.main.emit('DEBUG', this.shard, 'client closed connection');
 					resolve();
 				});
