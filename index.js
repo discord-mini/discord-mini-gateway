@@ -51,6 +51,7 @@ class Connection {
 		this.close().then(() =>
 			this.connect()
 		).then(() => {
+			this.main.emit('DEBUG', this.shard, 'sent resume packet');
 			this.socket.send(e({
 				op: 6,
 				d: {
@@ -63,6 +64,7 @@ class Connection {
 	}
 
 	close() {
+		this.main.emit('DEBUG', this.shard, 'client attempting to close connection');
 		if (this.hbtimer) {
 			clearInterval(this.hbtimer);
 		}
@@ -81,11 +83,13 @@ class Connection {
 	}
 
 	connect(cb) {
+		this.main.emit('DEBUG', this.shard, 'starting connection packet');
 		return new Promise((resolve, reject) => {
 			this.socket = new WebSocket(this.main.url + '?encoding=' + encoding);
 			this.socket.once('open', () => {
 				this.main.emit('DEBUG', this.shard, 'opened connection');
 				this.socket.once('message', p((payload) => {
+					this.main.emit('DEBUG', this.shard, 'recieved heartbeat info ' + JSON.stringify(payload.d));
 					this.hbinterval = payload.d.heartbeat_interval;
 					this.hbfunc = this.beat;
 					if (this.hbtimer) {
@@ -99,9 +103,9 @@ class Connection {
 					}
 				}));
 			});
-			this.socket.once('close', () => {
-				this.main.emit('DEBUG', this.shard, 'server closed connection, reconnecting in 5');
-				setTimeout(() => this.connect(), 5000);
+			this.socket.once('close', (code, reason) => {
+				this.main.emit('DEBUG', this.shard, 'server closed connection. code: ' + code + ', reason: ' + reason + ' reconnecting in 10');
+				setTimeout(() => this.close().then(() => this.connect()), 10000);
 			});
 			this.socket.once('error', () => {
 				this.main.emit('DEBUG', this.shard, 'recieved error ' + e.message + ', reconnecting in 5');
