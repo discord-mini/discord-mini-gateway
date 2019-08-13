@@ -172,7 +172,7 @@ class GatewaySocket extends EventEmitter {
 				hostname: 'discordapp.com',
 				path: '/api/gateway/bot',
 				headers: {
-					Authorization: this.token
+					Authorization: "Bot " + this.token
 				}
 			}, (res) => {
 				let data = '';
